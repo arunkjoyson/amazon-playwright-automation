@@ -16,7 +16,7 @@ export class HomePage {
   }
 
   async goto() {
-    await this.page.goto('https://www.amazon.com/');
+    await this.page.goto('https://www.amazon.ca/');
   }
 
   async acceptCookiesIfPresent() {
