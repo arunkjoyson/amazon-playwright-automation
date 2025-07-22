@@ -18,7 +18,7 @@ Clone this repository:
 git clone git@github.com:arunkjoyson/amazon-playwright-automation.git
 cd amazon-playwright-automation
 
-##$ install dependencies:
+##@ install dependencies:
 
 npm install
 
