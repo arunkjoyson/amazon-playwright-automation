@@ -1,5 +1,3 @@
-// pages/HomePage.ts
-
 import { Page, Locator } from '@playwright/test';
 
 export class HomePage {
@@ -16,27 +14,34 @@ export class HomePage {
   }
 
   async goto() {
-    await this.page.goto('https://www.amazon.ca/');
+    // Navigate to Amazon.com
+    await this.page.goto('https://www.amazon.com/');
   }
 
   async acceptCookiesIfPresent() {
     try {
-      await this.page.click('#sp-cc-accept', { timeout: 3000 });
-    } catch (err) {
-      // Ignore if not found
+      await this.page.locator('#sp-cc-accept').click({ timeout: 3000 });
+    } catch {
+      // Cookie consent not present on all regions
     }
   }
 
   async handlePopupAndRedirect() {
-    if (await this.shopOnCaPopup.isVisible({ timeout: 5000 })) {
-      await Promise.all([
-        this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-        this.shopOnCaPopup.click()
-      ]);
+    try {
+      if (await this.shopOnCaPopup.isVisible({ timeout: 5000 })) {
+        await Promise.all([
+          this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+          this.shopOnCaPopup.click()
+        ]);
+      }
+    } catch {
+      // Redirect popup not shown
     }
   }
 
   async searchFor(product: string) {
+    // Wait explicitly to avoid flaky fill failure
+    await this.page.waitForSelector('#twotabsearchtextbox', { state: 'visible', timeout: 10000 });
     await this.searchBox.fill(product);
     await this.searchButton.click();
   }
