@@ -15,7 +15,7 @@ export class HomePage {
 
   async goto() {
     await this.page.goto('https://www.amazon.com/', { waitUntil: 'domcontentloaded' });
-    await this.page.waitForLoadState('networkidle'); // ensure page is fully loaded
+    await this.page.waitForLoadState('networkidle');
   }
 
   async acceptCookiesIfPresent() {
@@ -43,7 +43,8 @@ export class HomePage {
     const maxAttempts = 3;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        await this.page.locator('#twotabsearchtextbox').waitFor({ state: 'visible', timeout: 7000 });
+        // Wait for search form as a more stable anchor
+        await this.page.waitForSelector('form[name="site-search"]', { timeout: 10000 });
 
         const isVisible = await this.searchBox.isVisible();
         const isEnabled = await this.searchBox.isEnabled();
