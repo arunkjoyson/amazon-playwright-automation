@@ -1,4 +1,4 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 export class HomePage {
   readonly page: Page;
@@ -21,7 +21,7 @@ export class HomePage {
     try {
       await this.page.locator('#sp-cc-accept').click({ timeout: 3000 });
     } catch {
-      // Cookie consent not present on all regions
+      // Cookie consent not shown
     }
   }
 
@@ -39,14 +39,21 @@ export class HomePage {
   }
 
   async searchFor(product: string) {
-    // Retry logic to ensure the search box is visible
-    const isVisible = await this.searchBox.isVisible({ timeout: 10000 });
-
-    if (!isVisible) {
-      throw new Error('Search box not visible after timeout');
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await this.page.waitForSelector('#twotabsearchtextbox', { state: 'visible', timeout: 5000 });
+        await this.searchBox.fill(product);
+        await this.searchButton.click();
+        return;
+      } catch (err) {
+        console.warn(`Attempt ${attempt}: Search box not visible.`);
+        if (attempt === maxAttempts) {
+          await this.page.screenshot({ path: `searchbox-failure-attempt${attempt}.png` });
+          throw new Error('Search box not visible after multiple attempts');
+        }
+        await this.page.waitForTimeout(1000); // brief wait before retry
+      }
     }
-
-    await this.searchBox.fill(product);
-    await this.searchButton.click();
   }
 }
