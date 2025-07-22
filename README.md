@@ -1,5 +1,7 @@
 # Amazon Playwright Automation Framework
 
+![Playwright Tests](https://github.com/arunkjoyson/amazon-playwright-automation/actions/workflows/playwright.yml/badge.svg)
+
 This repository contains an automation framework for testing the Amazon website using [Microsoft Playwright](https://playwright.dev/).  
 It includes a basic test that opens the Amazon homepage, handles regional redirects, searches for a product, and validates search results.
 
