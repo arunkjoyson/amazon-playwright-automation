@@ -1,28 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { HomePage } from '../pages/HomePage';
+import { SearchResultsPage } from '../pages/SearchResultsPage';
 
-test('Amazon.ca homepage loads and searches', async ({ page }) => {
-  await page.goto('https://www.amazon.com/');
+test('Amazon.ca search for laptop and validate Mac result', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const resultsPage = new SearchResultsPage(page);
 
-  // Optional: Accept cookies if present
-  try {
-    await page.click('#sp-cc-accept', { timeout: 3000 });
-  } catch (err) {
-    // Ignore if not found
-  }
+  await homePage.goto();
+  await homePage.acceptCookiesIfPresent();
+  await homePage.handlePopupAndRedirect();
 
-  // Check if popup is visible and click
-  const shopOnCaPopup = page.locator('span:has-text("Shop on Amazon.ca")');
-  if (await shopOnCaPopup.isVisible({ timeout: 5000 })) {
-    await shopOnCaPopup.click();
+  await expect(page).toHaveURL(/https:\/\/www\.amazon\.ca/);
 
-    // Explicit wait for redirect to Amazon.ca
-    await page.waitForURL('https://www.amazon.ca/**');
-  }
-
-  // Ensure you are on Amazon.ca and search there
-  await page.fill('#twotabsearchtextbox', 'laptop');
-  await page.click('#nav-search-submit-button');
-
-  const results = page.locator('span.a-size-medium');
-  await expect(results.first()).toBeVisible();
+  await homePage.searchFor('laptop');
+  await resultsPage.verifyResultsContainKeyword('Mac');
 });
