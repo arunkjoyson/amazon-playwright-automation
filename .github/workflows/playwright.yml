@@ -27,6 +27,8 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          PW_HEADLESS: 'true'
 
       - name: Upload Playwright HTML report
         if: always()
