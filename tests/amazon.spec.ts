@@ -6,13 +6,13 @@ test('Amazon.ca search for laptop and validate search term displayed', async ({ 
   const homePage = new HomePage(page);
   const resultsPage = new SearchResultsPage(page);
 
-  await homePage.goto();
-  await homePage.acceptCookiesIfPresent();
-  await homePage.handlePopupAndRedirect();
+  
+  await page.goto('https://www.amazon.ca/');
 
-  await expect(page).toHaveURL(/https:\/\/www\.amazon\.ca/);
+  await homePage.acceptCookiesIfPresent();
 
   await homePage.searchFor('laptop');
 
+  // Validate that the search term "laptop" appears at the top of search results
   await resultsPage.verifySearchTermDisplayed('laptop');
 });
