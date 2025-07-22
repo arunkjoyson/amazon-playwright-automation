@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class HomePage {
   readonly page: Page;
@@ -14,8 +14,7 @@ export class HomePage {
   }
 
   async goto() {
-    // Navigate to Amazon.com
-    await this.page.goto('https://www.amazon.com/');
+    await this.page.goto('https://www.amazon.com/', { waitUntil: 'load' });
   }
 
   async acceptCookiesIfPresent() {
@@ -40,8 +39,13 @@ export class HomePage {
   }
 
   async searchFor(product: string) {
-    // Wait explicitly to avoid flaky fill failure
-    await this.page.waitForSelector('#twotabsearchtextbox', { state: 'visible', timeout: 10000 });
+    // Retry logic to ensure the search box is visible
+    const isVisible = await this.searchBox.isVisible({ timeout: 10000 });
+
+    if (!isVisible) {
+      throw new Error('Search box not visible after timeout');
+    }
+
     await this.searchBox.fill(product);
     await this.searchButton.click();
   }
