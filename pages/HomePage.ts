@@ -14,7 +14,8 @@ export class HomePage {
   }
 
   async goto() {
-    await this.page.goto('https://www.amazon.com/', { waitUntil: 'load' });
+    await this.page.goto('https://www.amazon.com/', { waitUntil: 'domcontentloaded' });
+    await this.page.waitForLoadState('networkidle'); // ensure page is fully loaded
   }
 
   async acceptCookiesIfPresent() {
@@ -42,17 +43,25 @@ export class HomePage {
     const maxAttempts = 3;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        await this.page.waitForSelector('#twotabsearchtextbox', { state: 'visible', timeout: 5000 });
+        await this.page.locator('#twotabsearchtextbox').waitFor({ state: 'visible', timeout: 7000 });
+
+        const isVisible = await this.searchBox.isVisible();
+        const isEnabled = await this.searchBox.isEnabled();
+
+        if (!isVisible || !isEnabled) {
+          throw new Error('Search box is not ready for input');
+        }
+
         await this.searchBox.fill(product);
         await this.searchButton.click();
         return;
       } catch (err) {
-        console.warn(`Attempt ${attempt}: Search box not visible.`);
+        console.warn(`Attempt ${attempt} failed: ${err}`);
         if (attempt === maxAttempts) {
           await this.page.screenshot({ path: `searchbox-failure-attempt${attempt}.png` });
-          throw new Error('Search box not visible after multiple attempts');
+          throw new Error('Search box not visible or interactable after multiple attempts');
         }
-        await this.page.waitForTimeout(1000); // brief wait before retry
+        await this.page.waitForTimeout(1000);
       }
     }
   }
