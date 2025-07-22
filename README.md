@@ -18,5 +18,21 @@ Clone this repository:
 git clone git@github.com:arunkjoyson/amazon-playwright-automation.git
 cd amazon-playwright-automation
 
+##$ install dependencies:
+
+npm install
+
+### Install Playwright browsers:
+
+npx playwright install
+
+### Running tests
+
+npx playwright test
+
+### Viewing reports
+
+npx playwright show-report
+
 ## Author
 Arun Kanjirathingal Joyson
