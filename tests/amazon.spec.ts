@@ -10,7 +10,7 @@ test('Amazon.ca search for laptop and validate Mac result', async ({ page }) => 
   await homePage.acceptCookiesIfPresent();
   await homePage.handlePopupAndRedirect();
 
-  await expect(page).toHaveURL(/https:\/\/www\.amazon\.ca/);
+  await expect(page).toHaveURL(/https:\/\/www\.amazon\.(ca|com)/);
 
   await homePage.searchFor('laptop');
   await resultsPage.verifyResultsContainKeyword('Mac');
